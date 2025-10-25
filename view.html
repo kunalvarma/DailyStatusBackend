@@ -2,22 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>View Daily Tasks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Daily Status</title>
   <style>
-    body { font-family: Arial; background: #f5f5f5; text-align: center; padding: 40px; }
-    table { border-collapse: collapse; width: 90%; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; }
-    th, td { border: 1px solid #ddd; padding: 10px; }
-    th { background: #4CAF50; color: white; }
-    tr:nth-child(even) { background: #f2f2f2; }
-    .refresh { background: #2196F3; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 5px; }
-    .refresh:hover { background: #1976D2; }
+    body { font-family: Arial, sans-serif; padding: 30px; background: #fafafa; }
+    h2 { color: #222; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    button { margin-bottom: 10px; padding: 8px 15px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #1976D2; }
   </style>
 </head>
 <body>
-  <h2>All Daily Task Entries</h2>
-  <button class="refresh" onclick="loadData()">Refresh</button>
-  <br><br>
-  <table id="taskTable">
+  <h2>All Submitted Tasks</h2>
+  <button onclick="loadData()">Refresh</button>
+  <table>
     <thead>
       <tr>
         <th>Date</th>
@@ -26,29 +27,35 @@
         <th>Sheet</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="table-body"></tbody>
   </table>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwx_AC2oz_IHWr8gM6Yl29F0CNdUsNAS0M4SjguUyIualKJYQVOnRojLXbIoPzO1mP7/exec"; // same as in index.html
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwx_AC2oz_IHWr8gM6Yl29F0CNdUsNAS0M4SjguUyIualKJYQVOnRojLXbIoPzO1mP7/exec";
 
     async function loadData() {
-      const res = await fetch(scriptURL);
-      const data = await res.json();
-      const tbody = document.querySelector("#taskTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.date}</td>
-          <td>${row.name}</td>
-          <td>${row.task}</td>
-          <td>${row.sheet}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+      try {
+        const res = await fetch(scriptURL);
+        const entries = await res.json();
+        const tbody = document.getElementById("table-body");
+        tbody.innerHTML = "";
+
+        entries.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.date}</td>
+            <td>${row.name}</td>
+            <td>${row.task}</td>
+            <td>${row.sheet}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        alert("❌ Error fetching data: " + err.message);
+      }
     }
 
+    // Load data on page load
     loadData();
   </script>
 </body>
